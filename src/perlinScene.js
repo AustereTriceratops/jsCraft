@@ -5,8 +5,6 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
 import { ClearPass } from 'three/examples/jsm/postprocessing/ClearPass';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 
-import { ClassicalNoise } from './utils/noise';
-
 export class Store {
     width = window.innerWidth;
     height = window.innerHeight
@@ -19,8 +17,8 @@ export class Store {
     controls = new OrbitControls(this.camera, this.renderer.domElement);
 
     ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
-    directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-    directionalLight2 = new THREE.DirectionalLight(0xffbbbb, 0.5);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    directionalLight2 = new THREE.DirectionalLight(0xbbffbb, 0.5);
 
     composer;
 
@@ -44,8 +42,8 @@ export class Store {
     }
 
     setupLights() {
-        this.directionalLight.position.set(-0.7, 1, -0.2);
-        this.directionalLight2.position.set(1, -0.7, -0.6);
+        this.directionalLight.position.set(-0.7, 1, 0.2);
+        this.directionalLight2.position.set(1, 0.7, -0.6);
         this.scene.add(this.ambientLight);
         this.scene.add(this.directionalLight);
         this.scene.add(this.directionalLight2);
@@ -70,18 +68,11 @@ export class Store {
 
         for (let i = 0; i < 20; i++) {
             for (let j = 0; j < 20; j++) {
-                for (let k = 0; k < 20; k++) {
-                    const noise = new ClassicalNoise();
-                    let state = noise.noise(i/10, j/10, k/10);
-                    
-                    if (state > 0.5){
-                        const position = new THREE.Vector3(i, j, k);
-                        const matrix = new THREE.Matrix4().compose(position, quaternion, scale);
-        
-                        boxes.setMatrixAt(s, matrix);
-                        s++;
-                    }
-                }
+                const position = new THREE.Vector3(i, i*i/10 + j*j/10, j);
+                const matrix = new THREE.Matrix4().compose(position, quaternion, scale);
+
+                boxes.setMatrixAt(s, matrix);
+                s++;
             }
         }
 
