@@ -5,6 +5,8 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
 import { ClearPass } from 'three/examples/jsm/postprocessing/ClearPass';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 
+import { ClassicalNoise } from './utils/noise';
+
 export class Store {
     width = window.innerWidth;
     height = window.innerHeight
@@ -58,7 +60,7 @@ export class Store {
         const material = new THREE.MeshLambertMaterial( {color: 0xbbbbbb} );
 
         const boxes = new THREE.InstancedMesh( geometry, material, 10000);
-        boxes.count = 100;
+        boxes.count = 1000;
 
         const rotation = new THREE.Euler(0, 0, 0);
         const quaternion = new THREE.Quaternion().setFromEuler(rotation);
@@ -66,13 +68,20 @@ export class Store {
 
         let s = 0;
 
-        for (let i = 0; i < 10; i++) {
-            for (let j = 0; j < 10; j++) {
-                const position = new THREE.Vector3(i, (i*i + j*j)/20, j);
-                const matrix = new THREE.Matrix4().compose(position, quaternion, scale);
-
-                boxes.setMatrixAt(s, matrix);
-                s++;
+        for (let i = 0; i < 20; i++) {
+            for (let j = 0; j < 20; j++) {
+                for (let k = 0; k < 20; k++) {
+                    const noise = new ClassicalNoise();
+                    let state = noise.noise(i/10, j/10, k/10);
+                    
+                    if (state > 0.5){
+                        const position = new THREE.Vector3(i, j, k);
+                        const matrix = new THREE.Matrix4().compose(position, quaternion, scale);
+        
+                        boxes.setMatrixAt(s, matrix);
+                        s++;
+                    }
+                }
             }
         }
 
